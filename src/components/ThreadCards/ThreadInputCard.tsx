@@ -3,14 +3,16 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useState, useContext } from "react";
-import apiClient from "../services/api";
-import { SubforumModel } from "../interfaces/SubforumModel";
+import apiClient from "../../services/api";
+import { SubforumModel } from "../../interfaces/SubforumModel";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "../../contexts/UserContext";
+import axios from "axios";
+import { PostSnackbarContext } from "../../contexts/PostSnackbarContext";
 
 type ThreadInputCardProps = {
   subforum: SubforumModel;
-  onNewThread: (trigger: string) => Promise<void>;
+  onNewThread: () => Promise<void>;
 };
 
 const ThreadInputCard: React.FC<ThreadInputCardProps> = ({
@@ -19,12 +21,13 @@ const ThreadInputCard: React.FC<ThreadInputCardProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [errorOpen, setErrorOpen] = React.useState(false);
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+  const { user } = useContext(UserContext);
+
+  const { setPostSnackbarTrigger, showPostSnackbar } =
+    useContext(PostSnackbarContext);
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
@@ -41,19 +44,36 @@ const ThreadInputCard: React.FC<ThreadInputCardProps> = ({
         `/subforums/${subforum.id}/threads`,
         postData
       );
-      console.log("Thread submitted successfully", response.data);
+      console.log("Thread submitted successfully: ", response.data);
       if (response.status === 201) {
-        await onNewThread("posted");
+        await onNewThread();
+        setPostSnackbarTrigger("Thread posted succesfully!");
+        showPostSnackbar();
         setTitle("");
         setContent("");
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error submitting thread:", error.message);
-      } else {
-        console.error("Unknown error:", error);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error("Error data:", error.response.data.error);
+          setErrorMsg(error.response.data.error);
+          setErrorOpen(true);
+        } else {
+          console.error("The request was made but no response was received");
+        }
       }
     }
+  };
+
+  const handleErrorClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setErrorOpen(false);
   };
 
   return (
@@ -104,6 +124,20 @@ const ThreadInputCard: React.FC<ThreadInputCardProps> = ({
           </Button>
         </CardContent>
       </Card>
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={3000}
+        onClose={handleErrorClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleErrorClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMsg}!
+        </Alert>
+      </Snackbar>
     </>
   );
 };
