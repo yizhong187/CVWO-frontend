@@ -6,4 +6,7 @@ export interface ReplyModel {
   createdAt: string;
   updatedAt: string;
   createdByName: string;
+  threadName: string;
+  subforumID: number;
+  subforumName: string;
 }
