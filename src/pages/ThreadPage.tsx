@@ -1,31 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { CssBaseline, Container, Snackbar, Alert } from "@mui/material";
+import { CssBaseline, Container } from "@mui/material";
 import apiClient from "../services/api";
 import { ThreadModel } from "../interfaces/ThreadModel";
-import ThreadIntroCard from "../components/ThreadIntroCard";
+import ThreadPageThreadCard from "../components/ThreadCards/ThreadPageThreadCard";
 import { ReplyModel } from "../interfaces/ReplyModel";
-import { SubforumModel } from "../interfaces/SubforumModel";
-import ReplyInputCard from "../components/ReplyInputCard";
-import ReplyCard from "../components/ReplyCard";
+import ReplyInputCard from "../components/ReplyCards/ReplyInputCard";
+import ThreadPageReplyCard from "../components/ReplyCards/ThreadPageReplyCard";
 import { UserContext } from "../contexts/UserContext";
 import LoginToPostButton from "../components/LoginToPostButton";
 import NoPostCard from "../components/NoPostCard";
+import PostSnackbar from "../components/Common/PostSnackbar";
+import LoginSnackbar from "../components/Common/LoginSnackbar";
 
 const ThreadPage: React.FC = () => {
+  // Extracting subforumID and threadID from URL parameters
   const { subforumID } = useParams<{ subforumID: string }>();
   const { threadID } = useParams<{ threadID: string }>();
 
-  const [subforum, setSubforum] = useState<SubforumModel>({
-    id: -1,
-    name: "",
-    description: "",
-    photoURL: "",
-    createdBy: "",
-    createdAt: "",
-    updatedAt: "",
-  });
-
+  // States for thread, replies and their corresponding errors
   const [thread, setThread] = useState<ThreadModel>({
     id: -1,
     subforumID: -1,
@@ -37,42 +30,16 @@ const ThreadPage: React.FC = () => {
     updatedAt: "",
     replyCount: -1,
     createdByName: "",
+    subforumName: "",
   });
-
   const [replies, setReplies] = useState<ReplyModel[]>([]);
-  const [subforumError, setSubforumError] = useState("");
   const [threadError, setThreadError] = useState("");
   const [repliesError, setRepliesError] = useState("");
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-  const [snackbarTrigger, setSnackbarTrigger] = useState("");
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+  // Using UserContext to access current user data
+  const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    const fetchSubforum = async () => {
-      try {
-        const response = await apiClient.get<SubforumModel>(
-          `/subforums/${subforumID}`
-        );
-        console.log("API response for subforum:", response.data);
-        setSubforum(response.data);
-      } catch (err) {
-        if (err instanceof Error) {
-          setSubforumError("An error occurred: " + err.message);
-        } else {
-          setSubforumError("An unknown error occurred");
-        }
-        console.error(err);
-      }
-    };
-
-    fetchSubforum();
-  }, [subforumID]);
-
+  // Fetching thread data from API
   useEffect(() => {
     const fetchThread = async () => {
       try {
@@ -93,7 +60,16 @@ const ThreadPage: React.FC = () => {
 
     fetchThread();
   }, [threadID]);
+  if (repliesError) {
+    return <div>Error in replies: {repliesError}</div>;
+  }
 
+  // Setting the document title based on Subforum name
+  useEffect(() => {
+    document.title = `Musicality Forum - ${thread.subforumName}`;
+  }, [thread]);
+
+  // Fetching replies data from API
   useEffect(() => {
     const fetchReplies = async () => {
       try {
@@ -115,28 +91,34 @@ const ThreadPage: React.FC = () => {
     fetchReplies();
   }, [threadID]);
 
-  if (repliesError) {
-    return <div>Error in replies: {repliesError}</div>;
-  }
-
-  if (subforumError) {
-    return <div>Error in subforum: {subforumError}</div>;
-  }
-
   if (threadError) {
     return <div>Error in thread: {threadError}</div>;
   }
 
-  const handleChangeReplies: (trigger: string) => Promise<void> = async (
-    trigger
-  ) => {
+  // Function to refresh thread data when thread is edited
+  const handleChangeThread: () => Promise<void> = async () => {
+    try {
+      const response = await apiClient.get<ThreadModel>(
+        `/subforums/${subforumID}/threads/${threadID}`
+      );
+      setThread(response.data);
+    } catch (err) {
+      if (err instanceof Error) {
+        setThreadError("An error occurred: " + err.message);
+      } else {
+        setThreadError("An unknown error occurred");
+      }
+      console.error(err);
+    }
+  };
+
+  // Function to refresh replies data when reply is edited or deleted
+  const handleChangeReplies: () => Promise<void> = async () => {
     try {
       const response = await apiClient.get<ReplyModel[]>(
         `/subforums/${subforumID}/threads/${threadID}/replies`
       );
       setReplies(response.data);
-      setSnackbarTrigger(trigger);
-      setIsSnackbarOpen(true);
     } catch (err) {
       if (err instanceof Error) {
         setRepliesError("An error occurred: " + err.message);
@@ -151,13 +133,12 @@ const ThreadPage: React.FC = () => {
     <>
       <CssBaseline />
       <main>
-        <ThreadIntroCard thread={thread} subforum={subforum} />
+        <ThreadPageThreadCard
+          thread={thread}
+          onChangeThread={handleChangeThread}
+        />
         {user ? (
-          <ReplyInputCard
-            subforum={subforum}
-            thread={thread}
-            onNewReply={handleChangeReplies}
-          />
+          <ReplyInputCard thread={thread} onNewReply={handleChangeReplies} />
         ) : (
           <LoginToPostButton type="reply" />
         )}
@@ -172,10 +153,9 @@ const ThreadPage: React.FC = () => {
           >
             {replies &&
               replies.map((reply: ReplyModel) => (
-                <ReplyCard
+                <ThreadPageReplyCard
                   key={reply.id}
                   reply={reply}
-                  subforumID={subforum.id}
                   onChangeReply={handleChangeReplies}
                 />
               ))}
@@ -184,19 +164,8 @@ const ThreadPage: React.FC = () => {
           <NoPostCard type="reply" />
         )}
       </main>
-      <Snackbar
-        open={isSnackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setIsSnackbarOpen(false)}
-      >
-        <Alert
-          onClose={() => setIsSnackbarOpen(false)}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          Reply {snackbarTrigger} successfully!
-        </Alert>
-      </Snackbar>
+      <PostSnackbar />
+      <LoginSnackbar />
     </>
   );
 };
