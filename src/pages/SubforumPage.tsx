@@ -3,17 +3,22 @@ import { useParams } from "react-router-dom";
 import { CssBaseline, Container, Snackbar, Alert } from "@mui/material";
 import { SubforumModel } from "../interfaces/SubforumModel";
 import apiClient from "../services/api";
-import ArtistIntroCard from "../components/ArtistIntroCard";
+import ArtistIntroCard from "../components/ArtistCards/ArtistIntroCard";
 import { ThreadModel } from "../interfaces/ThreadModel";
-import ThreadCard from "../components/ThreadCard";
-import ThreadInputCard from "../components/ThreadInputCard";
+import SubforumPageThreadCard from "../components/ThreadCards/SubforumPageThreadCard";
+import ThreadInputCard from "../components/ThreadCards/ThreadInputCard";
 import { UserContext } from "../contexts/UserContext";
 import LoginToPostButton from "../components/LoginToPostButton";
 import NoPostCard from "../components/NoPostCard";
+import PostSnackbar from "../components/Common/PostSnackbar";
+import LoginSnackbar from "../components/Common/LoginSnackbar";
+import { PostSnackbarContext } from "../contexts/PostSnackbarContext";
 
 const SubforumPage: React.FC = () => {
+  // Extracting subforumID from URL parameters
   const { subforumID } = useParams<{ subforumID: string }>();
 
+  // States for subforum, threads and their corresponding errors
   const [subforum, setSubforum] = useState<SubforumModel>({
     id: -1,
     name: "",
@@ -26,15 +31,20 @@ const SubforumPage: React.FC = () => {
   const [subforumError, setSubforumError] = useState("");
   const [threads, setThreads] = useState<ThreadModel[]>([]);
   const [threadsError, setThreadsError] = useState("");
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-  const [snackbarTrigger, setSnackbarTrigger] = useState("");
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+  // Using UserContext and PostSnackbarContext to access user data and post snackbar control
+  const { user } = useContext(UserContext);
+  const { closePostSnackbar, postSnackbarTrigger } =
+    useContext(PostSnackbarContext);
 
+  // Close post snackbar if unless triggered by 'Thread deleted successfully' (Redirected from thread page after deleting thread)
+  useEffect(() => {
+    if (postSnackbarTrigger != "Thread deleted successfully!") {
+      closePostSnackbar();
+    }
+  }, []);
+
+  // Fetching subforum data from API
   useEffect(() => {
     const fetchSubforum = async () => {
       try {
@@ -55,7 +65,16 @@ const SubforumPage: React.FC = () => {
 
     fetchSubforum();
   }, [subforumID]);
+  if (subforumError) {
+    return <div>Error in subforum: {subforumError}</div>;
+  }
 
+  // Setting the document title based on subforum name
+  useEffect(() => {
+    document.title = `Musicality Forum - ${subforum.name}`;
+  }, [subforum]);
+
+  // Fetching threads data from API
   useEffect(() => {
     const fetchThreads = async () => {
       try {
@@ -77,24 +96,17 @@ const SubforumPage: React.FC = () => {
     fetchThreads();
   }, [subforumID]);
 
-  if (subforumError) {
-    return <div>Error in subforum: {subforumError}</div>;
-  }
-
   if (threadsError) {
     return <div>Error in threads: {threadsError}</div>;
   }
 
-  const handleChangeThreads: (trigger: string) => Promise<void> = async (
-    trigger
-  ) => {
+  // Function to refresh threads data when deleted or edited
+  const handleChangeThreads: () => Promise<void> = async () => {
     try {
       const response = await apiClient.get<ThreadModel[]>(
         `/subforums/${subforumID}/threads`
       );
       setThreads(response.data);
-      setSnackbarTrigger(trigger);
-      setIsSnackbarOpen(true);
     } catch (err) {
       if (err instanceof Error) {
         setThreadsError("An error occurred: " + err.message);
@@ -130,7 +142,7 @@ const SubforumPage: React.FC = () => {
             >
               {threads &&
                 threads.map((thread: ThreadModel) => (
-                  <ThreadCard
+                  <SubforumPageThreadCard
                     key={thread.id}
                     thread={thread}
                     onChangeThread={handleChangeThreads}
@@ -142,19 +154,8 @@ const SubforumPage: React.FC = () => {
           )}
         </div>
       </main>
-      <Snackbar
-        open={isSnackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setIsSnackbarOpen(false)}
-      >
-        <Alert
-          onClose={() => setIsSnackbarOpen(false)}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          Thread {snackbarTrigger} successfully!
-        </Alert>
-      </Snackbar>
+      <PostSnackbar />
+      <LoginSnackbar />
     </>
   );
 };

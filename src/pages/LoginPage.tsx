@@ -1,24 +1,33 @@
-import React, { useState, ChangeEvent, FormEvent, useContext } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  useEffect,
+} from "react";
 import {
   Avatar,
   Button,
   CssBaseline,
   TextField,
-  Link,
   Grid,
   Box,
   Typography,
   Container,
   ButtonBase,
+  Alert,
+  Snackbar,
 } from "@mui/material/";
 import { useNavigate } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Copyright from "../components/CopyrightTag";
+import Copyright from "../components/Common/CopyrightTag";
 import apiClient from "../services/api";
 import { UserContext } from "../contexts/UserContext";
-import { SnackbarContext } from "../contexts/LoginSnackBarContext";
 import { styled } from "@mui/material/styles";
+import axios from "axios";
+import { LoginSnackbarContext } from "../contexts/LoginSnackbarContext";
 
+// Styling for the 'Don't have an account? Sign Up' button
 const StyledButtonBase = styled(ButtonBase)(({ theme }) => ({
   paddingTop: theme.spacing(1),
   textAlign: "left",
@@ -31,19 +40,27 @@ const StyledButtonBase = styled(ButtonBase)(({ theme }) => ({
 }));
 
 const LoginPage: React.FC = () => {
+  // States for form inputs and Snackbar messages
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [errorOpen, setErrorOpen] = React.useState(false);
 
   const navigate = useNavigate();
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user, setUser } = userContext;
+  // Using UserContext to access current user data
+  const { setUser } = useContext(UserContext);
 
-  const { showSnackbar } = useContext(SnackbarContext);
+  // Using LoginSnackbarContext to access showing login Snackbar from LoginSnackbarContext
+  const { showLoginSnackbar, setLoginSnackbarTrigger } =
+    useContext(LoginSnackbarContext);
 
+  // Setting the document title on component mount
+  useEffect(() => {
+    document.title = "Musicality Forum - Login or Sign up";
+  }, []);
+
+  // Handlers for form input changes
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
@@ -51,23 +68,42 @@ const LoginPage: React.FC = () => {
     setPassword(event.target.value);
   };
 
+  // Handlers for closing Snackbar
+  const handleErrorClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setErrorOpen(false);
+  };
+
+  // Handler for form submission
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = { name, password };
     try {
+      // Send a POST request to the /login endpoint with user credentials
       const response = await apiClient.post("/login", formData, {
         withCredentials: true,
       });
       const userData = response.data;
+      // Set user data, store it in session storage, and trigger login Snackbar
       setUser(userData);
       sessionStorage.setItem("user", JSON.stringify(userData));
-      showSnackbar();
-      navigate(-1);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error logging in:", error.message);
-      } else {
-        console.error("Unknown error:", error);
+      setLoginSnackbarTrigger("Login successful!");
+      showLoginSnackbar();
+      navigate(-1); // Navigate back to the previous page
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error("Error data:", error.response.data.error);
+          setErrorMsg(error.response.data.error);
+          setErrorOpen(true);
+        } else {
+          console.error("The request was made but no response was received");
+        }
       }
     }
   };
@@ -133,6 +169,20 @@ const LoginPage: React.FC = () => {
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={3000}
+        onClose={handleErrorClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleErrorClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMsg}!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
