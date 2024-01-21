@@ -1,32 +1,27 @@
 import React, { useEffect, useState, useContext } from "react";
-import {
-  CssBaseline,
-  Typography,
-  Container,
-  Grid,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+import { CssBaseline, Typography, Container, Grid } from "@mui/material";
 import { typographyStyles, gridContainerStyles } from "../AppStyles";
-import ArtistCard from "../components/ArtistCard";
+import ArtistCard from "../components/ArtistCards/ArtistCard";
 import { SubforumModel } from "../interfaces/SubforumModel";
 import apiClient from "../services/api";
 import { UserContext } from "../contexts/UserContext";
-import { SnackbarContext } from "../contexts/LoginSnackBarContext";
 import { Link } from "react-router-dom";
+import LoginSnackbar from "../components/Common/LoginSnackbar";
 
 const HomePage: React.FC = () => {
+  // State for storing subforums and potential errors
   const [subforums, setSubforums] = useState<SubforumModel[]>([]);
   const [subforumError, setSubforumError] = useState("");
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+  // Using UserContext to access current user data
+  const { user } = useContext(UserContext);
 
-  const { snackbarOpen, closeSnackbar } = useContext(SnackbarContext);
+  // Setting the document title on component mount
+  useEffect(() => {
+    document.title = "Musicality Forum";
+  }, []);
 
+  // Fetching subforum data from the API on component mount
   useEffect(() => {
     const fetchSubforums = async () => {
       try {
@@ -40,7 +35,6 @@ const HomePage: React.FC = () => {
 
     fetchSubforums();
   }, []);
-
   if (subforumError) {
     return <div>Subforum retrival error: {subforumError}</div>;
   }
@@ -48,21 +42,6 @@ const HomePage: React.FC = () => {
   return (
     <>
       <CssBaseline />
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={closeSnackbar}
-        message="Logged in successfully"
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={closeSnackbar}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          Logged in successfully!
-        </Alert>
-      </Snackbar>
       <div>
         <Container>
           <Typography
@@ -95,6 +74,7 @@ const HomePage: React.FC = () => {
           <Link to="/request-form">request</Link>!
         </Typography>
       </div>
+      <LoginSnackbar />
     </>
   );
 };
