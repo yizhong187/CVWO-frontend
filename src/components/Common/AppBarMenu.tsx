@@ -4,22 +4,17 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../services/api";
-import { UserContext } from "../contexts/UserContext";
+import apiClient from "../../services/api";
+import { UserContext } from "../../contexts/UserContext";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { LoginSnackbarContext } from "../../contexts/LoginSnackbarContext";
 
-interface UserMenuButtonProps {
-  username: string;
-}
-
-const UserMenuButton: React.FC<UserMenuButtonProps> = ({ username }) => {
+const UserMenuButton: React.FC = () => {
   const navigate = useNavigate();
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-
-  const { setUser } = userContext;
+  const { setUser, user } = useContext(UserContext);
+  const { showLoginSnackbar, setLoginSnackbarTrigger } =
+    useContext(LoginSnackbarContext);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -40,6 +35,8 @@ const UserMenuButton: React.FC<UserMenuButtonProps> = ({ username }) => {
       });
       setUser(null);
       sessionStorage.removeItem("user");
+      setLoginSnackbarTrigger("Logged out successfully!");
+      showLoginSnackbar();
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
@@ -62,7 +59,7 @@ const UserMenuButton: React.FC<UserMenuButtonProps> = ({ username }) => {
         disableElevation
       >
         <Typography variant="subtitle1" component="span">
-          {username}
+          {user?.name}
         </Typography>
       </Button>
 
@@ -81,9 +78,14 @@ const UserMenuButton: React.FC<UserMenuButtonProps> = ({ username }) => {
           horizontal: "right",
         }}
       >
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem onClick={() => navigate(`/profile/${user?.name}`)}>
           <AccountCircleIcon sx={{ marginRight: 2 }} />
           User Profile
+        </MenuItem>
+        <Divider sx={{ my: 0.5 }} />
+        <MenuItem onClick={() => navigate("/account-settings")}>
+          <SettingsIcon sx={{ marginRight: 2 }} />
+          Account Settings
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleLogout}>
