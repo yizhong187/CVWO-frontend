@@ -1,22 +1,23 @@
 import React, { useContext } from "react";
 import { Typography, Card, CardContent, Button, Box } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { ThreadModel } from "../interfaces/ThreadModel";
+import { ThreadModel } from "../../interfaces/ThreadModel";
 import moment from "moment";
-import PostMenuButton from "./PostMenuButton";
-import { UserContext } from "../contexts/UserContext";
+import PostMenuButton from "../Common/PostMenuButton";
+import { UserContext } from "../../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
-type ThreadCardProps = {
+type SubforumPageThreadCardProps = {
   thread: ThreadModel;
-  onChangeThread: (trigger: string) => Promise<void>;
+  onChangeThread: () => Promise<void>;
 };
 
-const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onChangeThread }) => {
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+const SubforumPageThreadCard: React.FC<SubforumPageThreadCardProps> = ({
+  thread,
+  onChangeThread,
+}) => {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   return (
     <Card sx={{ maxWidth: 900, margin: "auto", marginTop: 2 }}>
@@ -25,9 +26,24 @@ const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onChangeThread }) => {
           <Typography
             variant="caption"
             color="textSecondary"
-            sx={{ fontSize: 14, marginRight: 2 }}
+            sx={{ fontSize: 14 }}
           >
-            Posted by {thread.createdByName}
+            Posted by&nbsp;
+          </Typography>
+          <Typography
+            variant="button"
+            onClick={() => navigate(`/profile/${thread.createdByName}`)}
+            color="primary"
+            sx={{
+              cursor: "pointer",
+              "&:hover": {
+                textDecoration: "underline",
+              },
+              fontWeight: 500,
+              textTransform: "none",
+            }}
+          >
+            {thread.createdByName}
           </Typography>
           <Typography
             variant="caption"
@@ -35,7 +51,7 @@ const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onChangeThread }) => {
             align="right"
             sx={{ fontSize: 14 }}
           >
-            {moment(thread.createdAt).fromNow()}
+            &nbsp;{moment(thread.createdAt).fromNow()}
           </Typography>
           <Typography
             variant="h5"
@@ -59,16 +75,12 @@ const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onChangeThread }) => {
             </Typography>
           </Button>
         </CardContent>
-        {user?.id == thread.createdBy && (
-          <PostMenuButton
-            post={thread}
-            subforumID={thread.subforumID}
-            onChangeThread={onChangeThread}
-          />
+        {(user?.id == thread.createdBy || user?.type == "super") && (
+          <PostMenuButton post={thread} onChangeThread={onChangeThread} />
         )}
       </Box>
     </Card>
   );
 };
 
-export default ThreadCard;
+export default SubforumPageThreadCard;
