@@ -1,7 +1,7 @@
 import * as React from "react";
 import Typography from "@mui/material/Typography";
 import { CardMedia, Paper, Grid, CssBaseline } from "@mui/material";
-import { SubforumModel } from "../interfaces/SubforumModel";
+import { SubforumModel } from "../../interfaces/SubforumModel";
 
 type ArtistIntroCardProps = {
   subforum: SubforumModel;
