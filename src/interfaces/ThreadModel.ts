@@ -9,4 +9,5 @@ export interface ThreadModel {
   updatedAt: string;
   replyCount: number;
   createdByName: string;
+  subforumName: string;
 }
