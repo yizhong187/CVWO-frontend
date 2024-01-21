@@ -4,29 +4,29 @@ import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useState, useContext } from "react";
 import ForumIcon from "@mui/icons-material/Forum";
-import apiClient from "../services/api";
-import { ThreadModel } from "../interfaces/ThreadModel";
-import { SubforumModel } from "../interfaces/SubforumModel";
-import { UserContext } from "../contexts/UserContext";
+import apiClient from "../../services/api";
+import { ThreadModel } from "../../interfaces/ThreadModel";
+import { UserContext } from "../../contexts/UserContext";
+import axios from "axios";
+import { PostSnackbarContext } from "../../contexts/PostSnackbarContext";
 
 type ReplyInputCardProps = {
   thread: ThreadModel;
-  subforum: SubforumModel;
-  onNewReply: (trigger: string) => Promise<void>;
+  onNewReply: () => Promise<void>;
 };
 
 const ReplyInputCard: React.FC<ReplyInputCardProps> = ({
   thread,
-  subforum,
   onNewReply,
 }) => {
   const [content, setContent] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [errorOpen, setErrorOpen] = React.useState(false);
 
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+  const { user } = useContext(UserContext);
+
+  const { setPostSnackbarTrigger, showPostSnackbar } =
+    useContext(PostSnackbarContext);
 
   const handleContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContent(event.target.value);
@@ -36,21 +36,38 @@ const ReplyInputCard: React.FC<ReplyInputCardProps> = ({
     const postData = { content: content };
     try {
       const response = await apiClient.post(
-        `/subforums/${subforum.id}/threads/${thread.id}/replies`,
+        `/subforums/${thread.subforumID}/threads/${thread.id}/replies`,
         postData
       );
       console.log("Reply submitted successfully", response.data);
       if (response.status === 201) {
-        await onNewReply("posted");
+        await onNewReply();
+        setPostSnackbarTrigger("Reply posted succesfully!");
+        showPostSnackbar();
         setContent("");
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error submitting reply:", error.message);
-      } else {
-        console.error("Unknown error:", error);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error("Error data:", error.response.data.error);
+          setErrorMsg(error.response.data.error);
+          setErrorOpen(true);
+        } else {
+          console.error("The request was made but no response was received");
+        }
       }
     }
+  };
+
+  const handleErrorClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setErrorOpen(false);
   };
 
   return (
@@ -92,6 +109,20 @@ const ReplyInputCard: React.FC<ReplyInputCardProps> = ({
           </Button>
         </CardContent>
       </Card>
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={3000}
+        onClose={handleErrorClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleErrorClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMsg}!
+        </Alert>
+      </Snackbar>
     </>
   );
 };
