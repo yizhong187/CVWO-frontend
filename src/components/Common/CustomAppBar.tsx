@@ -1,4 +1,3 @@
-// CustomAppBar.tsx
 import React, { useContext } from "react";
 import {
   AppBar,
@@ -9,17 +8,13 @@ import {
 } from "@mui/material/";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "../../contexts/UserContext";
 import AppBarMenu from "./AppBarMenu";
 import LoginIcon from "@mui/icons-material/Login";
 
 const CustomAppBar: React.FC = () => {
   const navigate = useNavigate();
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserContext.Provider");
-  }
-  const { user } = userContext;
+  const { user } = useContext(UserContext);
 
   return (
     <>
@@ -43,7 +38,6 @@ const CustomAppBar: React.FC = () => {
             </Typography>
           </Button>
 
-          {/* Use the UserMenuButton Component */}
           {user == null ? (
             <Button
               variant="contained"
@@ -54,7 +48,7 @@ const CustomAppBar: React.FC = () => {
               Log In
             </Button>
           ) : (
-            <AppBarMenu username={user.name} />
+            <AppBarMenu />
           )}
         </Toolbar>
       </AppBar>
