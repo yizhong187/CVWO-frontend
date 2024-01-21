@@ -1,20 +1,25 @@
-import React, { useState } from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Copyright from "../components/CopyrightTag";
-import apiClient from "../services/api";
-import { Alert, ButtonBase, Snackbar } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { styled } from "@mui/material/styles";
 import axios from "axios";
+import apiClient from "../services/api";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  Alert,
+  ButtonBase,
+  Snackbar,
+  styled,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Copyright from "../components/Common/CopyrightTag";
 
+// Styling for the 'Already have an account' button
 const StyledButtonBase = styled(ButtonBase)(({ theme }) => ({
   paddingTop: theme.spacing(1),
   textAlign: "left",
@@ -27,6 +32,7 @@ const StyledButtonBase = styled(ButtonBase)(({ theme }) => ({
 }));
 
 const SignUpPage: React.FC = () => {
+  // States for form inputs and Snackbar messages
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -35,14 +41,20 @@ const SignUpPage: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // Setting the document title on component mount
+  useEffect(() => {
+    document.title = "Musicality Forum - Login or Sign up";
+  }, []);
+
+  // Handlers for form input changes
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
-
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
 
+  // Handlers for closing Snackbar
   const handleSuccessClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -50,10 +62,8 @@ const SignUpPage: React.FC = () => {
     if (reason === "clickaway") {
       return;
     }
-
     setSuccessOpen(false);
   };
-
   const handleErrorClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -61,15 +71,16 @@ const SignUpPage: React.FC = () => {
     if (reason === "clickaway") {
       return;
     }
-
     setErrorOpen(false);
   };
 
+  // Handler for form submission
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = { name, password };
     console.log(formData);
     try {
+      // Send a POST request to the /signup endpoint with user credentials
       const response = await apiClient.post("/signup", formData);
       console.log("Signed up successfully", response.data);
       setSuccessOpen(true);
@@ -81,15 +92,9 @@ const SignUpPage: React.FC = () => {
           console.error("Error data:", error.response.data.error);
           setErrorMsg(error.response.data.error);
           setErrorOpen(true);
-          setName("");
-          setPassword("");
         } else {
           console.error("The request was made but no response was received");
         }
-      } else if (error instanceof Error) {
-        console.error("Error signing up:", error.message);
-      } else {
-        console.error("An unexpected error occurred");
       }
     }
   };
@@ -185,7 +190,7 @@ const SignUpPage: React.FC = () => {
           severity="error"
           sx={{ width: "100%" }}
         >
-          {errorMsg}
+          {errorMsg}!
         </Alert>
       </Snackbar>
     </Container>
