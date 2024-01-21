@@ -1,10 +1,12 @@
 import ForumIcon from "@mui/icons-material/Forum";
 import { Card, Typography } from "@mui/material";
 
+// Define props for the NoPostCard component
 type NoPostCardProps = {
-  type: string;
+  type: string; // Type of post (e.g., "thread" or "reply")
 };
 
+// NoPostCard component that displays a message when there are no posts of a certain type
 const NoPostCard: React.FC<NoPostCardProps> = ({ type }) => {
   return (
     <Card
