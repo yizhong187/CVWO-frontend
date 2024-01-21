@@ -1,43 +1,57 @@
 import React, { createContext, useState, ReactNode } from "react";
 
-interface SnackbarContextValue {
-  snackbarOpen: boolean;
-  showSnackbar: () => void;
-  closeSnackbar: () => void;
+interface LoginSnackbarContextValue {
+  loginSnackbarOpen: boolean;
+  loginSnackbarTrigger: string;
+  showLoginSnackbar: () => void;
+  closeLoginSnackbar: () => void;
+  setLoginSnackbarTrigger: (trigger: string) => void;
 }
 
-const defaultSnackbarContextValue: SnackbarContextValue = {
-  snackbarOpen: false,
-  showSnackbar: () => {},
-  closeSnackbar: () => {},
+const defaultLoginSnackbarContextValue: LoginSnackbarContextValue = {
+  loginSnackbarOpen: false,
+  loginSnackbarTrigger: "",
+  showLoginSnackbar: () => {},
+  closeLoginSnackbar: () => {},
+  setLoginSnackbarTrigger: () => {},
 };
 
-export const SnackbarContext = createContext<SnackbarContextValue>(
-  defaultSnackbarContextValue
+export const LoginSnackbarContext = createContext<LoginSnackbarContextValue>(
+  defaultLoginSnackbarContextValue
 );
 
-interface SnackbarProviderProps {
-  children: ReactNode;
+interface LoginSnackbarProviderProps {
+  children: ReactNode; // Accepts any ReactNode as children
 }
 
-export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
+// LoginSnackbarProvider component to provide LoginSnackbarContext to its children
+export const LoginSnackbarProvider: React.FC<LoginSnackbarProviderProps> = ({
   children,
 }) => {
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [loginSnackbarOpen, setLoginSnackbarOpen] = useState(false);
+  const [loginSnackbarTrigger, setLoginSnackbarTrigger] = useState("");
 
-  const showSnackbar = () => {
-    setSnackbarOpen(true);
+  // Function to show the login snackbar
+  const showLoginSnackbar = () => {
+    setLoginSnackbarOpen(true);
   };
 
-  const closeSnackbar = () => {
-    setSnackbarOpen(false);
+  // Function to close the login snackbar
+  const closeLoginSnackbar = () => {
+    setLoginSnackbarOpen(false);
   };
 
   return (
-    <SnackbarContext.Provider
-      value={{ snackbarOpen, showSnackbar, closeSnackbar }}
+    <LoginSnackbarContext.Provider
+      value={{
+        loginSnackbarOpen,
+        loginSnackbarTrigger,
+        showLoginSnackbar,
+        closeLoginSnackbar,
+        setLoginSnackbarTrigger,
+      }}
     >
       {children}
-    </SnackbarContext.Provider>
+    </LoginSnackbarContext.Provider>
   );
 };
