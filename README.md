@@ -47,7 +47,7 @@ In the `screenshots` directory, you'll find screenshots and explanations of all 
 Encounter an issue? Check out these common problems and solutions:
 
 - **Dependency Installation Issues**: Ensure Node.js is up-to-date. Run `npm cache clean --force` and then `npm install`. Check for any specific dependency errors in the terminal and address them as instructed.
-- **`Subforum retrival error: An error occurred`**: Verify that the backend application is running and on the right port.
+- **Subforum retrival error: An error occurred**: Verify that the backend application is running and on the right port.
 - Note that most of the components that require the fetching or posting of data will log the API response in the console.
 
 For more help, please open an issue on the [GitHub issues page](https://github.com/yizhong187/CVWO-frontend/issues).
