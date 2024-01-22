@@ -135,7 +135,7 @@ const ThreadPage: React.FC = () => {
       <main>
         <ThreadPageThreadCard
           thread={thread}
-          onChangeThread={handleChangeThread}
+          onChangePost={handleChangeThread}
         />
         {user ? (
           <ReplyInputCard thread={thread} onNewReply={handleChangeReplies} />

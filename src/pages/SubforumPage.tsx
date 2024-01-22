@@ -39,6 +39,7 @@ const SubforumPage: React.FC = () => {
 
   // Close post snackbar if unless triggered by 'Thread deleted successfully' (Redirected from thread page after deleting thread)
   useEffect(() => {
+    console.log("postSnackbarTrigger: ", postSnackbarTrigger);
     if (postSnackbarTrigger != "Thread deleted successfully!") {
       closePostSnackbar();
     }
@@ -145,7 +146,7 @@ const SubforumPage: React.FC = () => {
                   <SubforumPageThreadCard
                     key={thread.id}
                     thread={thread}
-                    onChangeThread={handleChangeThreads}
+                    onChangePost={handleChangeThreads}
                   />
                 ))}
             </Container>

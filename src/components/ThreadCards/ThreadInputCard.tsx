@@ -17,15 +17,18 @@ type ThreadInputCardProps = {
 
 const ThreadInputCard: React.FC<ThreadInputCardProps> = ({
   subforum,
-  onNewThread,
+  onNewThread, // Used to update Subforum Page after new thread posted
 }) => {
+  // States for handling form inputs and error messages.
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [errorOpen, setErrorOpen] = React.useState(false);
 
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
 
+  // Using PostSnackbarContext to access PostSnackbar configs
   const { setPostSnackbarTrigger, showPostSnackbar } =
     useContext(PostSnackbarContext);
 
@@ -40,12 +43,16 @@ const ThreadInputCard: React.FC<ThreadInputCardProps> = ({
   const handleSubmit = async () => {
     const postData = { title: title, content: content };
     try {
+      // Attempt to send a POST request to the server with the thread data.
       const response = await apiClient.post(
         `/subforums/${subforum.id}/threads`,
         postData
       );
       console.log("Thread submitted successfully: ", response.data);
+
+      // Check if the response status is 201 (Created).
       if (response.status === 201) {
+        // Invoke the onNewThread callback to update the Subforum Page
         await onNewThread();
         setPostSnackbarTrigger("Thread posted succesfully!");
         showPostSnackbar();

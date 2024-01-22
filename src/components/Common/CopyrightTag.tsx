@@ -9,6 +9,7 @@ const Copyright: React.FC<any> = (props) => {
       align="center"
       {...props}
     >
+      {/* Copyright text with dynamic year and link to GitHub profile */}
       {"Copyright © "}
       <Link color="inherit" href="https://github.com/yizhong187">
         Yizhong

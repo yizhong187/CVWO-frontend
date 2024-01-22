@@ -9,13 +9,14 @@ import { useNavigate } from "react-router-dom";
 
 type ProfilePageReplyCardProps = {
   reply: ReplyModel;
-  onChangeReply: () => Promise<void>;
+  onChangeReply: () => Promise<void>; // Passed to PostMenuButton to update Profile Page after thread/replies changes (edit and delete)
 };
 
 const ProfilePageReplyCard: React.FC<ProfilePageReplyCardProps> = ({
   reply,
   onChangeReply,
 }) => {
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -98,7 +99,7 @@ const ProfilePageReplyCard: React.FC<ProfilePageReplyCardProps> = ({
           </Typography>
         </CardContent>
         {(user?.id == reply.createdBy || user?.type == "super") && (
-          <PostMenuButton post={reply} onChangeThread={onChangeReply} />
+          <PostMenuButton post={reply} onChangePost={onChangeReply} />
         )}
       </Box>
     </Card>

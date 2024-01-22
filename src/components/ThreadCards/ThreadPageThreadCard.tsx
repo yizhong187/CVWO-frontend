@@ -9,13 +9,14 @@ import PostMenuButton from "../Common/PostMenuButton";
 
 type ThreadPageThreadCardProps = {
   thread: ThreadModel;
-  onChangeThread: () => Promise<void>;
+  onChangePost: () => Promise<void>; // Passed to PostMenuButton to update Profile Page after thread/replies changes (edit and delete)
 };
 
 const ThreadPageThreadCard: React.FC<ThreadPageThreadCardProps> = ({
   thread,
-  onChangeThread,
+  onChangePost,
 }) => {
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -87,10 +88,11 @@ const ThreadPageThreadCard: React.FC<ThreadPageThreadCardProps> = ({
             {thread.content}
           </Typography>
         </CardContent>
+        {/* Display PostMenuButton only if the current user is the thread creator or a superuser */}
         {(user?.id == thread.createdBy || user?.type == "super") && (
           <PostMenuButton
             post={thread}
-            onChangeThread={onChangeThread}
+            onChangePost={onChangePost}
             onDeleteRedirect={true}
           />
         )}

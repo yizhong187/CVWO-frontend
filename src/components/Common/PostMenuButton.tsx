@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 interface PostMenuButtonProps {
   post: ThreadModel | ReplyModel;
-  onChangeThread: () => Promise<void>;
+  onChangePost: () => Promise<void>;
   onDeleteRedirect?: boolean;
 }
 
@@ -33,9 +33,10 @@ function isThreadModel(post: ThreadModel | ReplyModel): post is ThreadModel {
 
 const PostMenuButton: React.FC<PostMenuButtonProps> = ({
   post,
-  onChangeThread,
+  onChangePost,
   onDeleteRedirect = false,
 }) => {
+  // States for menu control and editing/deleting posts.
   const [title, setTitle] = useState(isThreadModel(post) ? post.title : "");
   const [content, setContent] = useState(post.content);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -48,6 +49,7 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
   const { showPostSnackbar, setPostSnackbarTrigger } =
     useContext(PostSnackbarContext);
 
+  // Handlers for menu actions (edit, delete) and dialog controls.
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -72,16 +74,20 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
 
   const confirmSave = async () => {
     try {
+      // Determine the appropriate API endpoint based on whether the post is a thread or a reply.
       const requestURL = isThreadModel(post)
         ? `/subforums/${post.subforumID}/threads/${post.id}`
         : `/subforums/${post.subforumID}/threads/${post.threadID}/replies/${post.id}`;
+      // Send a PUT request to update the post with the new title and content. (reply endpoint will ignore the title)
       const response = await apiClient.put(requestURL, {
         title: title,
         content: content,
       });
       console.log("Post edited successfully: ", response.data);
+      // Check if the response status is 200 (Successful).
       if (response.status === 200) {
-        await onChangeThread();
+        // Invoke the onChangePost callback to update the Page after the edit is succesful
+        await onChangePost();
         handleClose();
         setPostSnackbarTrigger(
           isThreadModel(post)
@@ -105,11 +111,14 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
 
   const confirmDelete = async () => {
     try {
+      // Determine the appropriate API endpoint for deletion.
       const requestURL = isThreadModel(post)
         ? `/subforums/${post.subforumID}/threads/${post.id}`
         : `/subforums/${post.subforumID}/threads/${post.threadID}/replies/${post.id}`;
+      // Send a DELETE request to remove the post.
       const response = await apiClient.delete(requestURL);
       console.log("Post deleted successfully: ", response.data);
+      // Check if the response status is 200 (Successful).
       if (response.status === 200) {
         setPostSnackbarTrigger(
           isThreadModel(post)
@@ -117,11 +126,13 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
             : "Reply deleted successfully!"
         );
         showPostSnackbar();
+        // Redirect if necessary (for threads on thread page)
         if (onDeleteRedirect && isThreadModel(post)) {
           handleClose();
-          navigate(-1);
+          navigate(`/subforums/${post.subforumID}`);
         }
-        await onChangeThread();
+        // Invoke the onChangePost callback to update the Page after the delete is succesful
+        await onChangePost();
         handleClose();
       }
     } catch (error) {

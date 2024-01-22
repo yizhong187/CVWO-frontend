@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 type ErrorCardProps = {
-  text: string;
+  text: string; // Message to be displayed
   Icon: React.ElementType;
 };
 

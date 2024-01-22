@@ -12,19 +12,22 @@ import { PostSnackbarContext } from "../../contexts/PostSnackbarContext";
 
 type ReplyInputCardProps = {
   thread: ThreadModel;
-  onNewReply: () => Promise<void>;
+  onNewReply: () => Promise<void>; // Used to update Subforum Page after new reply posted
 };
 
 const ReplyInputCard: React.FC<ReplyInputCardProps> = ({
   thread,
   onNewReply,
 }) => {
+  // States for managing reply content and error messages.
   const [content, setContent] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [errorOpen, setErrorOpen] = React.useState(false);
 
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
 
+  // Using PostSnackbarContext to access PostSnackbar configs
   const { setPostSnackbarTrigger, showPostSnackbar } =
     useContext(PostSnackbarContext);
 
@@ -35,12 +38,15 @@ const ReplyInputCard: React.FC<ReplyInputCardProps> = ({
   const handleSubmit = async () => {
     const postData = { content: content };
     try {
+      // Attempt to send a POST request to the server with the reply data.
       const response = await apiClient.post(
         `/subforums/${thread.subforumID}/threads/${thread.id}/replies`,
         postData
       );
       console.log("Reply submitted successfully", response.data);
+      // Check if the response status is 201 (Created).
       if (response.status === 201) {
+        // Invoke the onNewReply callback to update the Subforum Page
         await onNewReply();
         setPostSnackbarTrigger("Reply posted succesfully!");
         showPostSnackbar();

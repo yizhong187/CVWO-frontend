@@ -93,7 +93,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <>
-      <CssBaseline />
+      {}
       <Paper
         sx={{
           maxWidth: 900,
@@ -150,7 +150,7 @@ const ProfilePage: React.FC = () => {
               <ProfilePageThreadCard
                 key={thread.id}
                 thread={thread}
-                onChangeThread={handleChangeData}
+                onChangePost={handleChangeData}
               />
             ))
           ) : (

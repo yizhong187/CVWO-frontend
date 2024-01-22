@@ -9,16 +9,16 @@ import { useNavigate } from "react-router-dom";
 
 type ReplyCardProps = {
   reply: ReplyModel;
-  onChangeReply: () => Promise<void>;
+  onChangeReply: () => Promise<void>; // Passed to PostMenuButton to update Thread Page after reply changes (edit and delete)
 };
 
 const ThreadPageReplyCard: React.FC<ReplyCardProps> = ({
   reply,
   onChangeReply,
 }) => {
-  const navigate = useNavigate();
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
-
+  const navigate = useNavigate();
   return (
     <Card sx={{ maxWidth: 900, margin: "auto", marginTop: 2 }}>
       <Box display="flex" justifyContent="space-between">
@@ -57,8 +57,9 @@ const ThreadPageReplyCard: React.FC<ReplyCardProps> = ({
             {reply.content}
           </Typography>
         </CardContent>
+        {/* Show PostMenuButton if the user is the creator of the reply or a super user */}
         {(user?.id == reply.createdBy || user?.type == "super") && (
-          <PostMenuButton post={reply} onChangeThread={onChangeReply} />
+          <PostMenuButton post={reply} onChangePost={onChangeReply} />
         )}
       </Box>
     </Card>

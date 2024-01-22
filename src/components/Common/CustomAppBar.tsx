@@ -13,9 +13,10 @@ import AppBarMenu from "./AppBarMenu";
 import LoginIcon from "@mui/icons-material/Login";
 
 const CustomAppBar: React.FC = () => {
-  const navigate = useNavigate();
+  // Contexts for user details
   const { user } = useContext(UserContext);
 
+  const navigate = useNavigate();
   return (
     <>
       <CssBaseline />
@@ -37,7 +38,7 @@ const CustomAppBar: React.FC = () => {
               Musicality Forum
             </Typography>
           </Button>
-
+          {/* Conditional rendering for login/userMenu */}
           {user == null ? (
             <Button
               variant="contained"

@@ -9,13 +9,14 @@ import { useNavigate } from "react-router-dom";
 
 type SubforumPageThreadCardProps = {
   thread: ThreadModel;
-  onChangeThread: () => Promise<void>;
+  onChangePost: () => Promise<void>; // Passed to PostMenuButton to update Subforum Page after thread/replies changes (edit and delete)
 };
 
 const SubforumPageThreadCard: React.FC<SubforumPageThreadCardProps> = ({
   thread,
-  onChangeThread,
+  onChangePost,
 }) => {
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -75,8 +76,9 @@ const SubforumPageThreadCard: React.FC<SubforumPageThreadCardProps> = ({
             </Typography>
           </Button>
         </CardContent>
+        {/* Display PostMenuButton only if the current user is the thread creator or a superuser */}
         {(user?.id == thread.createdBy || user?.type == "super") && (
-          <PostMenuButton post={thread} onChangeThread={onChangeThread} />
+          <PostMenuButton post={thread} onChangePost={onChangePost} />
         )}
       </Box>
     </Card>

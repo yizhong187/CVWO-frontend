@@ -24,7 +24,7 @@ const AccountSettingsPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   // Using UserContext to access current user data
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   // State for storing username and password in form
   const [name, setName] = useState(user ? user.name : "");
@@ -45,6 +45,7 @@ const AccountSettingsPage: React.FC = () => {
       if (response.status === 200) {
         setIsSnackbarOpen(true);
         setPassword("");
+        setUser(response.data);
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

@@ -9,13 +9,15 @@ import { UserContext } from "../../contexts/UserContext";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { LoginSnackbarContext } from "../../contexts/LoginSnackbarContext";
 
-const UserMenuButton: React.FC = () => {
+const AppBarMenu: React.FC = () => {
   const navigate = useNavigate();
 
+  // Contexts for user details and login snackbar.
   const { setUser, user } = useContext(UserContext);
   const { showLoginSnackbar, setLoginSnackbarTrigger } =
     useContext(LoginSnackbarContext);
 
+  // State for menu anchor (used for positioning).
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -27,6 +29,7 @@ const UserMenuButton: React.FC = () => {
     setAnchorEl(null);
   };
 
+  // Handles logout functionality.
   const handleLogout = async (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
     try {
@@ -97,4 +100,4 @@ const UserMenuButton: React.FC = () => {
   );
 };
 
-export default UserMenuButton;
+export default AppBarMenu;

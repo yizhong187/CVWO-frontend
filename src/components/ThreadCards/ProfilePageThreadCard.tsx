@@ -10,13 +10,14 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 type ProfilePageThreadCardProps = {
   thread: ThreadModel;
-  onChangeThread: () => Promise<void>;
+  onChangePost: () => Promise<void>; // Passed to PostMenuButton to update Profile Page after thread/replies changes (edit and delete)
 };
 
 const ProfilePageThreadCard: React.FC<ProfilePageThreadCardProps> = ({
   thread,
-  onChangeThread,
+  onChangePost,
 }) => {
+  // Using UserContext to access user data
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -77,8 +78,9 @@ const ProfilePageThreadCard: React.FC<ProfilePageThreadCardProps> = ({
             </Typography>
           </Button>
         </CardContent>
+        {/* Display PostMenuButton only if the current user is the thread creator or a superuser */}
         {(user?.id == thread.createdBy || user?.type == "super") && (
-          <PostMenuButton post={thread} onChangeThread={onChangeThread} />
+          <PostMenuButton post={thread} onChangePost={onChangePost} />
         )}
       </Box>
     </Card>
