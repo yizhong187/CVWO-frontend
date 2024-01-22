@@ -69,10 +69,6 @@ const HomePage: React.FC = () => {
             </Grid>
           </div>
         </Container>
-        <Typography variant="h6" align="left" sx={typographyStyles} p={2}>
-          Can't find an artist? Drop us a{" "}
-          <Link to="/request-form">request</Link>!
-        </Typography>
       </div>
       <LoginSnackbar />
     </>
