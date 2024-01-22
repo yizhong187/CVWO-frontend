@@ -1,65 +1,53 @@
-# Project Title
+# Setup Guide for CVWO ForumApp Frontend
 
-Provide a clear and concise title that reflects the essence of your web application.
+## Introduction
 
-## Description
+Welcome to the setup guide for ForumApp, a web application built using ViteJS, React, and MUI (Material-UI). This document will guide you through the process of setting up the application on your local server.
 
-A brief description of your application:
+## Prerequisites
 
-- What it does
-- The motivation behind creating it
-- Any unique features or highlights
-
-## Visuals
-
-(Optional) Include screenshots or videos demonstrating the application's functionality or UI.
+Before you begin, ensure you have Node.js installed on your system. You can download it from [Node.js official website](https://nodejs.org/).
 
 ## Installation
 
-Provide step-by-step instructions to set up the project locally:
+1. **Clone the Repository**  
+   Clone the repository to your local machine using the following command:
 
-1. Pre-requisites (like Node.js, any global packages, or environment setup)
-2. How to clone the repository
-3. Commands to install dependencies (e.g., `npm install`)
-4. Any specific configuration or setup required
+   ```bash
+   git clone https://github.com/yizhong187/CVWO-frontend.git
+   cd CVWO-frontend
+   ```
 
-## Usage
+2. **Install Dependencies**  
+   Inside the project directory, run the following command to install the required dependencies:
 
-Instructions on how to use the application:
+   ```bash
+   npm install
+   ```
 
-- Starting the application (e.g., `npm start`)
-- Navigating through the application
-- Any user account prerequisites (if applicable)
+3. **API Base URLs**  
+   Set up API_BASE_URL in the `services/api.ts` file. By default, assuming that you are setting this up with the ForumApp backend from https://github.com/yizhong187/CVWO, it will be using http://localhost:8080/v2.
 
-## Technologies Used
+## Running the Application
 
-List of technologies, frameworks, and libraries used:
+To start the application in development mode, run:
 
-- HTML/CSS/JavaScript
-- React/Angular/Vue (or any other frameworks)
-- Any other notable libraries or APIs
+```bash
+npm run dev
+```
 
-## Contributing
+Upon running `npm run dev`, vite will provide the local address where the application is hosted. By deafult, it will be http://localhost:5173/. Open your web browser and visit the link to view the application.
 
-Guidelines for those who wish to contribute:
+## Screenshots and User Perspectives
 
-- How to submit pull requests
-- Coding standards or style guidelines
-- Contact information for queries
+In the `screenshots` directory, you'll find screenshots and explanations of all the pages from the perspectives of different users (guest, normal user, superuser). It's recommended to view these for a better understanding of the application's functionality and user interface.
 
-## Authors and Acknowledgment
+## Troubleshooting
 
-- Credit yourself and any collaborators
-- Acknowledge any third-party assets or code used
+Encounter an issue? Check out these common problems and solutions:
 
-## License
+- **Dependency Installation Issues**: Ensure Node.js is up-to-date. Run `npm cache clean --force` and then `npm install`. Check for any specific dependency errors in the terminal and address them as instructed.
+- **`Subforum retrival error: An error occurred`**: Verify that the backend application is running and on the right port.
+- Note that most of the components that require the fetching or posting of data will log the API response in the console.
 
-Information about the project's license (if applicable).
-
-## Contact
-
-Your contact information or links to your professional profiles (GitHub, LinkedIn).
-
-## Project Status
-
-(Optional) Update on the current status of the project – is it in development, maintenance, etc.?
+For more help, please open an issue on the [GitHub issues page](https://github.com/yizhong187/CVWO-frontend/issues).
