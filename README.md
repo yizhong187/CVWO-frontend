@@ -26,7 +26,7 @@ Before you begin, ensure you have Node.js installed on your system. You can down
    ```
 
 3. **API Base URLs**  
-   Set up API_BASE_URL in the `services/api.ts` file. By default, assuming that you are setting this up with the ForumApp backend from https://github.com/yizhong187/CVWO, it will be using http://localhost:8080/v2.
+   Set up API_BASE_URL in the `services/api.ts` file. By default, assuming that you are setting this up with the ForumApp backend from https://github.com/yizhong187/CVWO, it will be using `http://localhost:8080/v2`.
 
 ## Running the Application
 
@@ -36,7 +36,7 @@ To start the application in development mode, run:
 npm run dev
 ```
 
-Upon running `npm run dev`, vite will provide the local address where the application is hosted. By deafult, it will be http://localhost:5173/. Open your web browser and visit the link to view the application.
+Upon running `npm run dev`, vite will provide the local address where the application is hosted. By deafult, it will be `http://localhost:5173/`. Open your web browser and visit the link to view the application.
 
 ## Screenshots and User Perspectives
 
