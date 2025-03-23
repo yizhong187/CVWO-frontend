@@ -5,7 +5,6 @@ import ArtistCard from "../components/ArtistCards/ArtistCard";
 import { SubforumModel } from "../interfaces/SubforumModel";
 import apiClient from "../services/api";
 import { UserContext } from "../contexts/UserContext";
-import { Link } from "react-router-dom";
 import LoginSnackbar from "../components/Common/LoginSnackbar";
 
 const HomePage: React.FC = () => {
@@ -43,7 +42,7 @@ const HomePage: React.FC = () => {
     <>
       <CssBaseline />
       <div>
-        <Container>
+        <Container sx={{ paddingBottom: 8 }}>
           <Typography
             variant="h4"
             align="center"

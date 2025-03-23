@@ -25,7 +25,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea onClick={() => navigate(`/subforums/${id}`)}>
         <CardMedia component="img" height="200" image={photoURL} alt={title} />
-        <CardContent>
+        <CardContent sx={{ maxWidth: 345, height: 180 }}>
           <Typography gutterBottom variant="h5" component="div">
             {title}
           </Typography>

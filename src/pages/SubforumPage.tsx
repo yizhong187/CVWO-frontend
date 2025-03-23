@@ -121,7 +121,7 @@ const SubforumPage: React.FC = () => {
   return (
     <>
       <CssBaseline />
-      <main>
+      <main style={{ padding: "32px" }}>
         <ArtistIntroCard subforum={subforum} />
         {user ? (
           <ThreadInputCard
