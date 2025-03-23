@@ -32,7 +32,6 @@ const StyledButtonBase = styled(ButtonBase)(({ theme }) => ({
 }));
 
 const SignUpPage: React.FC = () => {
-  // States for form inputs and Snackbar messages
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -41,7 +40,6 @@ const SignUpPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Setting the document title on component mount
   useEffect(() => {
     document.title = "Musicality Forum - Login or Sign up";
   }, []);
@@ -80,7 +78,6 @@ const SignUpPage: React.FC = () => {
     const formData = { name, password };
     console.log(formData);
     try {
-      // Send a POST request to the /signup endpoint with user credentials
       const response = await apiClient.post("/signup", formData);
       console.log("Signed up successfully", response.data);
       setSuccessOpen(true);

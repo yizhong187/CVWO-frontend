@@ -40,7 +40,6 @@ const StyledButtonBase = styled(ButtonBase)(({ theme }) => ({
 }));
 
 const LoginPage: React.FC = () => {
-  // States for form inputs and Snackbar messages
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -48,14 +47,11 @@ const LoginPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Using UserContext to access current user data
   const { setUser } = useContext(UserContext);
 
-  // Using LoginSnackbarContext to access showing login Snackbar from LoginSnackbarContext
   const { showLoginSnackbar, setLoginSnackbarTrigger } =
     useContext(LoginSnackbarContext);
 
-  // Setting the document title on component mount
   useEffect(() => {
     document.title = "Musicality Forum - Login or Sign up";
   }, []);
@@ -84,12 +80,10 @@ const LoginPage: React.FC = () => {
     event.preventDefault();
     const formData = { name, password };
     try {
-      // Send a POST request to the /login endpoint with user credentials
       const response = await apiClient.post("/login", formData, {
         withCredentials: true,
       });
       const userData = response.data;
-      // Set user data, store it in session storage, and trigger login Snackbar
       setUser(userData);
       sessionStorage.setItem("user", JSON.stringify(userData));
       setLoginSnackbarTrigger("Login successful!");

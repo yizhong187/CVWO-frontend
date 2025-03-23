@@ -8,19 +8,15 @@ import { UserContext } from "../contexts/UserContext";
 import LoginSnackbar from "../components/Common/LoginSnackbar";
 
 const HomePage: React.FC = () => {
-  // State for storing subforums and potential errors
   const [subforums, setSubforums] = useState<SubforumModel[]>([]);
   const [subforumError, setSubforumError] = useState("");
 
-  // Using UserContext to access current user data
   const { user } = useContext(UserContext);
 
-  // Setting the document title on component mount
   useEffect(() => {
     document.title = "Musicality Forum";
   }, []);
 
-  // Fetching subforum data from the API on component mount
   useEffect(() => {
     const fetchSubforums = async () => {
       try {

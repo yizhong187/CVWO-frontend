@@ -18,7 +18,6 @@ const ThreadPage: React.FC = () => {
   const { subforumID } = useParams<{ subforumID: string }>();
   const { threadID } = useParams<{ threadID: string }>();
 
-  // States for thread, replies and their corresponding errors
   const [thread, setThread] = useState<ThreadModel>({
     id: -1,
     subforumID: -1,
@@ -36,10 +35,12 @@ const ThreadPage: React.FC = () => {
   const [threadError, setThreadError] = useState("");
   const [repliesError, setRepliesError] = useState("");
 
-  // Using UserContext to access current user data
   const { user } = useContext(UserContext);
 
-  // Fetching thread data from API
+  useEffect(() => {
+    document.title = `Musicality Forum - ${thread.subforumName}`;
+  });
+
   useEffect(() => {
     const fetchThread = async () => {
       try {
@@ -59,17 +60,11 @@ const ThreadPage: React.FC = () => {
     };
 
     fetchThread();
-  }, [threadID]);
+  }, [subforumID, threadID]);
   if (repliesError) {
     return <div>Error in replies: {repliesError}</div>;
   }
 
-  // Setting the document title based on Subforum name
-  useEffect(() => {
-    document.title = `Musicality Forum - ${thread.subforumName}`;
-  }, [thread]);
-
-  // Fetching replies data from API
   useEffect(() => {
     const fetchReplies = async () => {
       try {
@@ -89,7 +84,7 @@ const ThreadPage: React.FC = () => {
     };
 
     fetchReplies();
-  }, [threadID]);
+  }, [subforumID, threadID]);
 
   if (threadError) {
     return <div>Error in thread: {threadError}</div>;

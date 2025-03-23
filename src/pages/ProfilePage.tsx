@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  CssBaseline,
   Paper,
   Box,
   Typography,
@@ -22,23 +21,20 @@ const ProfilePage: React.FC = () => {
   // Extracting userName from URL parameters
   const { userName } = useParams<{ userName: string }>();
 
-  // States for subforum, threads and their corresponding errors
   const [choice, setChoice] = useState("threads");
   const [threads, setThreads] = useState<ThreadModel[]>([]);
   const [replies, setReplies] = useState<ReplyModel[]>([]);
   const [dataError, setDataError] = useState("");
 
-  // Set the document title when the component mounts
   useEffect(() => {
     document.title = `Musicality Forum - ${userName}'s Profile`;
-  }, []);
+  });
 
   interface responseModel {
     replies: ReplyModel[];
     threads: ThreadModel[];
   }
 
-  // Fetch user's posts (both threads and replies) data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -58,7 +54,7 @@ const ProfilePage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  });
 
   // Handle user's choice to switch between threads and replies
   const handleChoice = (

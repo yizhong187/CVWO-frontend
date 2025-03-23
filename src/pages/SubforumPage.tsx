@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { CssBaseline, Container, Snackbar, Alert } from "@mui/material";
+import { CssBaseline, Container } from "@mui/material";
 import { SubforumModel } from "../interfaces/SubforumModel";
 import apiClient from "../services/api";
 import ArtistIntroCard from "../components/ArtistCards/ArtistIntroCard";
@@ -18,7 +18,6 @@ const SubforumPage: React.FC = () => {
   // Extracting subforumID from URL parameters
   const { subforumID } = useParams<{ subforumID: string }>();
 
-  // States for subforum, threads and their corresponding errors
   const [subforum, setSubforum] = useState<SubforumModel>({
     id: -1,
     name: "",
@@ -32,20 +31,22 @@ const SubforumPage: React.FC = () => {
   const [threads, setThreads] = useState<ThreadModel[]>([]);
   const [threadsError, setThreadsError] = useState("");
 
-  // Using UserContext and PostSnackbarContext to access user data and post snackbar control
   const { user } = useContext(UserContext);
   const { closePostSnackbar, postSnackbarTrigger } =
     useContext(PostSnackbarContext);
 
-  // Close post snackbar if unless triggered by 'Thread deleted successfully' (Redirected from thread page after deleting thread)
+  // Close post snackbar unless triggered by 'Thread deleted successfully' (Redirected from thread page after deleting thread)
   useEffect(() => {
     console.log("postSnackbarTrigger: ", postSnackbarTrigger);
     if (postSnackbarTrigger != "Thread deleted successfully!") {
       closePostSnackbar();
     }
-  }, []);
+  });
 
-  // Fetching subforum data from API
+  useEffect(() => {
+    document.title = `Musicality Forum - ${subforum.name}`;
+  });
+
   useEffect(() => {
     const fetchSubforum = async () => {
       try {
@@ -70,12 +71,6 @@ const SubforumPage: React.FC = () => {
     return <div>Error in subforum: {subforumError}</div>;
   }
 
-  // Setting the document title based on subforum name
-  useEffect(() => {
-    document.title = `Musicality Forum - ${subforum.name}`;
-  }, [subforum]);
-
-  // Fetching threads data from API
   useEffect(() => {
     const fetchThreads = async () => {
       try {
@@ -96,7 +91,6 @@ const SubforumPage: React.FC = () => {
 
     fetchThreads();
   }, [subforumID]);
-
   if (threadsError) {
     return <div>Error in threads: {threadsError}</div>;
   }

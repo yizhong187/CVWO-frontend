@@ -18,19 +18,15 @@ import EditSubforumCard from "../components/EditSubforumCard";
 import NewSubforumCard from "../components/NewSubforumCard";
 
 const AccountSettingsPage: React.FC = () => {
-  // State for storing snackbar, error snackbar and error message
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [isErrorOpen, setErrorOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Using UserContext to access current user data
   const { user, setUser } = useContext(UserContext);
 
-  // State for storing username and password in form
   const [name, setName] = useState(user ? user.name : "");
   const [password, setPassword] = useState("");
 
-  // Set the document title when the component mounts
   useEffect(() => {
     document.title = "Musicality Forum - Account Settings";
   }, []);
@@ -39,7 +35,6 @@ const AccountSettingsPage: React.FC = () => {
   const handleSubmit = async () => {
     const postData = { name: name, password: password };
     try {
-      // Send a put request to the /user endpoint with updated user credentials
       const response = await apiClient.put(`/user`, postData);
       console.log("User updated successfully", response.data);
       if (response.status === 200) {
